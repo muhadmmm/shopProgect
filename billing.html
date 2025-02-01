@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+        }
+
+        .header {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header .profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #e8f5e9;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 70px;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            color: #4caf50;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4caf50;
+        }
+
+        .container {
+            padding: 20px;
+            margin-left: 270px;
+            padding-top: 100px;
+            width: calc(100% - 270px);
+        }
+
+        .billing-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .billing-section h2 {
+            color: #4caf50;
+            margin-top: 0;
+        }
+
+        .product-search {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-search input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .product-search button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-search button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .print-button {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .print-button button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .print-button button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Grocery Shop Manager</h1>
+        <div class="profile">
+            <img src="profile-icon.png" alt="Profile Icon">
+            <span>Owner</span>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <ul>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="billing.html">Billing</a></li>
+        <li><a href="customer.html">Customer Management</a></li>
+        <li><a href="report.html">Reports</a></li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <div class="billing-section">
+            <h2>Billing</h2>
+
+            <div class="product-search">
+                <input type="text" id="product-search" placeholder="Search product...">
+                <button onclick="searchProduct()">Search</button>
+            </div>
+
+            <table id="product-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" class="no-data">No products added to the bill.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="print-button">
+                <button onclick="printBill()">Print Bill</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchProduct() {
+            const searchInput = document.getElementById('product-search').value;
+            alert('Searching for: ' + searchInput);
+            // Placeholder for actual search logic
+        }
+
+        function printBill() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

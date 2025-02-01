@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Shop Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        header .logo img {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        header .profile-icon {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4caf50;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #e8f5e9;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            height: 100vh;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            color: #4caf50;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #4caf50;
+        }
+
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .main h1 {
+            margin-bottom: 20px;
+        }
+
+        .main .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .main .actions button {
+            padding: 10px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .main .actions button:hover {
+            background-color: #45a049;
+        }
+
+        .main table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .main table th, .main table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .main table th {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .main table tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.jpg" alt="Logo">
+            <h1>Grocery Shop Manager</h1>
+        </div>
+        <div class="profile-icon">O</div>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="billing.html">Billing</a></li>
+            <li><a href="customer.html">Customer Management</a></li>
+            <li><a href="report.html">Reports</a></li>
+            </ul>
+        </nav>
+
+        <main class="main">
+            <h1>Stock Management</h1>
+            <div class="actions">
+                <button onclick="addProduct()">Add Product</button>
+                <button onclick="restockProduct()">Restock</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Apple</td>
+                        <td>Fruits</td>
+                        <td>50</td>
+                        <td>$1.20</td>
+                    </tr>
+                    <tr>
+                        <td>Rice</td>
+                        <td>Grains</td>
+                        <td>100</td>
+                        <td>$0.80</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script>
+        function addProduct() {
+            alert("Add Product button clicked!");
+        }
+
+        function restockProduct() {
+            alert("Restock button clicked!");
+        }
+    </script>
+</body>
+</html>
