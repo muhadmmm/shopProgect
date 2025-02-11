@@ -1,42 +1,29 @@
-
-<!-- login.php -->
 <?php
-session_start();
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $email = $conn->real_escape_string($_POST['email']);
+    $password = $_POST['password'];  // Don't hash the password here
 
-    // Check credentials
-    $stmt = $pdo->prepare("SELECT * FROM owners WHERE email = ? AND password = ?");
-    $stmt->execute([$email, $password]);
-    $owner = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Check if the email exists
+    $query = "SELECT * FROM owners WHERE email='$email'";
+    $result = $conn->query($query);
 
-    if ($owner) {
-        $_SESSION['owner_id'] = $owner['owner_id'];
-        header('Location: dashboard.php');
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify the plain password with the hashed password in the database
+        if (password_verify($password, $user['password'])) {
+            session_start();
+            $_SESSION['user'] = $user['name'];
+            $_SESSION['owner_id'] = $user['owner_id'];
+            echo "<script>alert('Login successful!'); window.location.href='dashboard.php';</script>";
+        } else {
+            echo "<script>alert('Incorrect password!'); window.location.href='login.html';</script>";
+        }
     } else {
-        echo "Invalid email or password.";
+        echo "<script>alert('Email not found! Please register.'); window.location.href='login.html';</script>";
     }
 }
+$conn->close();
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form action="login.php" method="POST">
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>
-
-

@@ -1,3 +1,27 @@
+<?php
+session_start();  // Start the session
+
+require 'db.php';  // Include your database connection
+
+// Redirect to login page if the user is not logged in
+if (!isset($_SESSION['owner_id'])) {
+    header('Location: login.html');
+    exit();  // Stop further execution
+}
+
+// Fetch owner info
+$owner_id = $_SESSION['owner_id'];
+$stmt = $conn->prepare("SELECT name FROM owners WHERE owner_id = ?");
+$stmt->bind_param("i", $owner_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$owner = $result->fetch_assoc();
+
+// Fetch products
+$products_result = $conn->query("SELECT * FROM products");
+$products = $products_result->fetch_all(MYSQLI_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,14 +160,20 @@
         }
 
         .form-container input[type="text"], 
-        .form-container input[type="number"] {
+        .form-container input[type="number"],select {
+            width: 97.5%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-container select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         .form-container button {
             background-color: #4caf50;
             color: white;
@@ -159,32 +189,12 @@
     </style>
 </head>
 <body>
-    <?php
-    session_start();
-    require 'db.php';
-
-    // Check if owner is logged in
-    if (!isset($_SESSION['owner_id'])) {
-        header('Location: login.php');
-        exit();
-    }
-
-    // Fetch owner info
-    $owner_id = $_SESSION['owner_id'];
-    $stmt = $pdo->prepare("SELECT name FROM owners WHERE owner_id = ?");
-    $stmt->execute([$owner_id]);
-    $owner = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Fetch products
-    $products = $pdo->query("SELECT * FROM products")->fetchAll(PDO::FETCH_ASSOC);
-    ?>
-
     <header>
         <div class="logo">
-            <img src="logo.jpg" alt="Logo">
+            <img src="logo.jpg" alt="Logo" height="40">
             <h1>Grocery Shop Manager</h1>
         </div>
-        <div class="profile-info">
+        <div>
             Welcome, <?php echo htmlspecialchars($owner['name']); ?>
         </div>
     </header>
@@ -197,18 +207,19 @@
                 <li><a href="billing.php">Billing</a></li>
                 <li><a href="customer.php">Customer Management</a></li>
                 <li><a href="report.php">Reports</a></li>
+                <li><a href="logout.php">Logout</a></li>
             </ul>
         </nav>
 
         <main class="main">
-            <h1>Stock Management</h1>
+            <h1>Stock Management </h1>
             <div class="actions">
                 <button onclick="showForm('addForm')">Add Product</button>
                 <button onclick="showForm('restockForm')">Restock</button>
             </div>
 
             <!-- Add Product Form -->
-            <div id="addForm" class="form-container">
+            <div id="addForm" style="display: none;"  class="form-container">
                 <h2>Add Product</h2>
                 <form action="add_product.php" method="POST">
                     <input type="text" name="name" placeholder="Product Name" required>
@@ -220,9 +231,9 @@
             </div>
 
             <!-- Restock Form -->
-            <div id="restockForm" class="form-container">
+            <div id="restockForm" style="display: none;" class="form-container">
                 <h2>Restock Product</h2>
-                <form action="restock_product.php" method="POST">
+                <form action="restock.php" method="POST">
                     <select name="product_id" required>
                         <option value="">Select Product</option>
                         <?php foreach ($products as $product): ?>
@@ -237,7 +248,7 @@
             </div>
 
             <!-- Products Table -->
-            <table>
+            <table border="1">
                 <thead>
                     <tr>
                         <th>Product ID</th>

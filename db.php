@@ -1,13 +1,15 @@
 <?php
-$host = "localhost";
-$db = "GroceryShop";
-$user = "root";  // Change if needed
-$pass = "";      // Change if needed
+// db.php
+$host = 'localhost';
+$db   = 'groceryshop';
+$user = 'root'; // Change if you have a different MySQL user
+$pass = '';     // Add password if required
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+// Create a connection
+$conn = new mysqli($host, $user, $pass, $db);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>
