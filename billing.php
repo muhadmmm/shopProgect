@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
 <body>
     <header class="header">
         <h1>Grocery Shop Manager</h1>
-        <p>Welcome, <strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
+        <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </header>
     <div class="container">
         <nav class="sidebar">
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
                     </thead>
                     <tbody>
                         <?php foreach ($products as $product): ?>
-                            <tr>
+                            <tr class="product-row">
                                 <td><input type="checkbox" name="selected_products[]" value="<?= $product['product_id'] ?>"></td>
                                 <td><?= htmlspecialchars($product['name']) ?></td>
                                 <td><input type="number" name="products[<?= $product['product_id'] ?>]" min="1" max="<?= $product['quantity'] ?>"></td>
@@ -130,6 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
             <div class="bill-section" id="bill-section">
                 <?php if (!empty($bill_items)): ?>
                     <h3>Bill Receipt</h3>
+                    <p>Biller : <?php echo htmlspecialchars($owner['name']); ?></p>
                     <table>
                         <thead>
                             <tr>
@@ -148,12 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
                                     <td><?= $item['total'] ?></td>
                                 </tr>
                             <?php endforeach; ?>
+                            <tr><td colspan="3">total amount: </td><td><?= $total_amount ?></td></tr>
                         </tbody>
                     </table>
-                    <p>Total Amount: <?= $total_amount ?></p>
                     <p>Discount: <?= $customer_discount * 100 ?>%</p>
                     <p>Discounted Total: <?= $discounted_total ?></p>
                     <p>Customer Name: <?= $customer_name ?></p>
+                    <span><b>thank you visit again</b></span>
                 <?php endif; ?>
             </div>
             <button class="print-button" id="download-button" onclick="downloadBillImage()">Download Bill</button>
@@ -182,6 +184,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
             } else {
                 row.style.display = "none";
             }
+        });
+    }
+    function filterProducts() {
+        const searchTerm = document.getElementById("product-search").value.toLowerCase();
+        const rows = document.querySelectorAll(".product-row");
+
+        rows.forEach(row => {
+            const productName = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+            row.style.display = productName.includes(searchTerm) ? "" : "none";
         });
     }
 

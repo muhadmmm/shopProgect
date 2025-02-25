@@ -98,7 +98,7 @@ header .profile-info {
     background-color: #45a049;
 }
 
-table {
+.product-container table {
     width: 75%;
     border-collapse: collapse;
     background-color: white;
@@ -107,18 +107,18 @@ table {
     overflow: hidden;
 }
 
-table th, table td {
+.product-container table th, table td {
     padding: 15px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
-table th {
+.product-container table th {
     background-color: #4caf50;
     color: white;
 }
 
-table tr:hover {
+.product-container table tr:hover {
     background-color: #f1f1f1;
 }
 
@@ -166,7 +166,7 @@ table tr:hover {
     width: 350px;
     background-color: white;
     padding: 20px;
-    border: 2px dashed #333;
+    border: 2px solid #333;
     margin-top: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -176,18 +176,21 @@ table tr:hover {
 .bill-section h3 {
     margin: 0;
     padding-bottom: 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px dashed #333;
 }
 
 .bill-section table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    border-bottom: 1px dashed #333;
+    border-top: 1px dashed #333;
+
 }
 
 .bill-section table th,
 .bill-section table td {
-    border-bottom: 1px dashed #aaa;
+    border: none;
     padding: 8px;
     font-size: 14px;
 }
@@ -215,7 +218,9 @@ table tr:hover {
 .bill-section button:hover {
     background-color: #45a049;
 }
-
+.bill-section span{
+    margin: 10px auto auto 5px;
+}
 /* Print Button */
 
   button {  
