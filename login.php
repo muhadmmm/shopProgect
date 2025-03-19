@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             session_start();
             $_SESSION['user'] = $user['name'];
             $_SESSION['owner_id'] = $user['owner_id'];
-            echo "<script>alert('Login successful!'); window.location.href='dashboard.php';</script>";
+            echo "<script>alert('Login successful!'); window.location.href='profile.php';</script>";
         } else {
             echo "<script>alert('Incorrect password!'); window.location.href='login.html';</script>";
         }

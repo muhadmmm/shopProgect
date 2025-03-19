@@ -19,6 +19,8 @@ $discounted_total = 0;
 $customer_discount = 0;
 $customer_name = '';
 $customer_phone = '';
+$customer_id = NULL;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_customer'])) {
     $customer_name = $_POST['customer_name'];
     $customer_phone = $_POST['customer_phone'];
@@ -68,6 +70,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
     }
     $discounted_total = $total_amount - ($total_amount * $customer_discount);
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
+    $customer_name = $_POST['customer_name'];
+    $customer_phone = $_POST['customer_phone'];
+    $sale_date = date('Y-m-d H:i:s'); // Capture current date & time
+    
+    if (isset($_POST['selected_products'])) {
+        foreach ($_POST['selected_products'] as $product_id) {
+            if (!empty($_POST['products'][$product_id])) {
+                $quantity = (int)$_POST['products'][$product_id];
+
+                // Fetch product price
+                $stmt = $conn->prepare("SELECT price, quantity FROM products WHERE product_id = ?");
+                $stmt->bind_param("i", $product_id);
+                $stmt->execute();
+                $product = $stmt->get_result()->fetch_assoc();
+
+                if ($product && $product['quantity'] >= $quantity) {
+                    $total_price = $product['price'] * $quantity;
+
+                    // Insert sale record into `sales` table
+                    $stmt = $conn->prepare("INSERT INTO sales (product_id, quantity_sold, total_price, sale_date) VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("iids", $product_id, $quantity, $total_price, $sale_date);
+                    $stmt->execute();
+
+                    // Reduce stock
+                    $stmt = $conn->prepare("UPDATE products SET quantity = quantity - ? WHERE product_id = ? AND owner_id = ?");
+                    $stmt->bind_param("iii", $quantity, $product_id , $owner_id);
+                    $stmt->execute();
+                }
+            }
+        }
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
 </head>
 <body>
     <header class="header">
-        <h1>Grocery Shop Manager</h1>
+        <h1>Billing</h1>
         <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </header>
     <div class="container">
@@ -88,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
             <h2>Menu</h2>
             <ul>
                 <li><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="stocks.php">Stocks</a></li>
                 <li><a href="billing.php">Billing</a></li>
                 <li><a href="customer.php">Customer Management</a></li>
                 <li><a href="report.php">Reports</a></li>
@@ -95,8 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
             </ul>
         </nav>
         <main class="main">
-            <h1>Billing</h1>
             <form method="POST" class="form-container">
+                <h3>Customer Details</h3>
                 <input type="text" name="customer_name" placeholder="Customer Name" value="<?= htmlspecialchars($customer_name) ?>" required>
                 <input type="text" name="customer_phone" placeholder="Customer Phone" value="<?= htmlspecialchars($customer_phone) ?>" required>
                 <button type="submit" name="save_customer">Save Customer</button>
@@ -128,36 +165,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
                 <button class="print-button" type="submit" name="bill" onclick="document.getElementById('download-button').style.display = 'block'">Generate Bill</button>
             </form>
             <div class="bill-section" id="bill-section">
-                <?php if (!empty($bill_items)): ?>
-                    <h3>Bill Receipt</h3>
-                    <p>Biller : <?php echo htmlspecialchars($owner['name']); ?></p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($bill_items as $item): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($item['product_name']) ?></td>
-                                    <td><?= $item['quantity'] ?></td>
-                                    <td><?= $item['price'] ?></td>
-                                    <td><?= $item['total'] ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            <tr><td colspan="3">total amount: </td><td><?= $total_amount ?></td></tr>
-                        </tbody>
-                    </table>
-                    <p>Discount: <?= $customer_discount * 100 ?>%</p>
-                    <p>Discounted Total: <?= $discounted_total ?></p>
-                    <p>Customer Name: <?= $customer_name ?></p>
-                    <span><b>thank you visit again</b></span>
+    <?php if (!empty($bill_items)): ?>
+        <h3>Bill Receipt</h3>
+        <p><strong>Biller:</strong> <?php echo htmlspecialchars($owner['name']); ?></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($bill_items as $item): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['product_name']) ?></td>
+                        <td><?= $item['quantity'] ?></td>
+                        <td><?= $item['price'] ?></td>
+                        <td><?= $item['total'] ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="3"><strong>Total Amount:</strong></td>
+                    <td><strong><?= number_format($total_amount, 2) ?></strong></td>
+                </tr>
+                
+                <?php if ($customer_discount > 0): ?>
+                    <tr>
+                        <td colspan="3"><strong>Discount Applied:</strong></td>
+                        <td><strong><?= ($customer_discount * 100) ?>%</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>Discounted Total:</strong></td>
+                        <td><strong><?= number_format($discounted_total, 2) ?></strong></td>
+                    </tr>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4"><strong>No Discount Applied</strong></td>
+                    </tr>
                 <?php endif; ?>
-            </div>
+            </tbody>
+        </table>
+
+        <p><strong>Customer Name:</strong> <?= htmlspecialchars($customer_name) ?></p>
+        <span><b>Thank you! Visit Again.</b></span>
+    <?php endif; ?>
+</div>
+
             <button class="print-button" id="download-button" onclick="downloadBillImage()">Download Bill</button>
         </main>
     </div>

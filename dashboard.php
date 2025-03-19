@@ -1,25 +1,32 @@
 <?php
-session_start();  // Start the session
-
-require 'db.php';  // Include your database connection
-
-// Redirect to login page if the user is not logged in
+session_start();
 if (!isset($_SESSION['owner_id'])) {
     header('Location: login.html');
-    exit();  // Stop further execution
+    exit();
 }
 
-// Fetch owner info
+require 'db.php';
 $owner_id = $_SESSION['owner_id'];
-$stmt = $conn->prepare("SELECT name FROM owners WHERE owner_id = ?");
-$stmt->bind_param("i", $owner_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$owner = $result->fetch_assoc();
 
-// Fetch products
-$products_result = $conn->query("SELECT * FROM products");
-$products = $products_result->fetch_all(MYSQLI_ASSOC);
+// Fetch sales stats
+$sales_query = $conn->query("SELECT COUNT(*) AS total_sales, SUM(total_price) AS revenue FROM sales WHERE owner_id = $owner_id");
+$sales_data = $sales_query->fetch_assoc();
+$total_sales = $sales_data['total_sales'] ?? 0;
+$total_revenue = $sales_data['revenue'] ?? 0;
+
+// Fetch top-selling products
+$top_products = $conn->query("SELECT p.name, SUM(s.quantity_sold) as total_sold FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.owner_id = $owner_id GROUP BY p.product_id ORDER BY total_sold DESC LIMIT 5");
+
+// Fetch stock status
+$low_stock = $conn->query("SELECT name, quantity FROM products WHERE quantity < 5 AND owner_id = $owner_id LIMIT 5");
+
+// Fetch customer insights
+$customer_query = $conn->query("SELECT COUNT(DISTINCT customer_id) AS total_customers FROM sales WHERE owner_id = $owner_id");
+$customer_data = $customer_query->fetch_assoc();
+$total_customers = $customer_data['total_customers'] ?? 0;
+
+// Fetch recent transactions
+$recent_sales = $conn->query("SELECT sale_date, total_price FROM sales WHERE owner_id = $owner_id ORDER BY sale_date DESC LIMIT 5");
 ?>
 
 <!DOCTYPE html>
@@ -27,264 +34,136 @@ $products = $products_result->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grocery Shop Manager Dashboard</title>
+    <title>Dashboard</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            background-color: #f8f9fa;
-            color: #333;
+            padding: 0;
+            background: #f4f4f4;
         }
-
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background-color: #4caf50;
+        .header {
+            background: #4CAF50;
             color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
         }
-
-        header .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        header .logo img {
-            height: 40px;
-            margin-right: 10px;
-            border-radius: 20px;
-        }
-
-        header .profile-info {
-            font-size: 18px;
-        }
-
         .container {
             display: flex;
         }
-
         .sidebar {
             width: 250px;
-            background-color: #e8f5e9;
+            background: #e8f5e9;
             padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             height: 100vh;
         }
-
-        .sidebar h2 {
-            margin-top: 0;
-            color: #4caf50;
-        }
-
         .sidebar ul {
             list-style: none;
             padding: 0;
         }
-
         .sidebar ul li {
             margin: 15px 0;
         }
-
         .sidebar ul li a {
             text-decoration: none;
             color: #333;
             font-size: 16px;
         }
-
-        .sidebar ul li a:hover {
-            color: #4caf50;
-        }
-
         .main {
-            flex: 1;
+            flex-grow: 1;
             padding: 20px;
         }
-
-        .main h1 {
-            margin-bottom: 20px;
-        }
-
-        .actions {
+        .stats, .graph-section {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 20px;
         }
-
-        .actions button {
-            padding: 10px 15px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .card {
+            background: white;
+            padding: 20px;
+            flex: 1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-
-        .actions button:hover {
-            background-color: #45a049;
+        .table-container {
+            margin-top: 20px;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
+            margin-top: 10px;
         }
-
-        table th, table td {
+        th, td {
             padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
-
-        table th {
-            background-color: #4caf50;
+        th {
+            background: #4CAF50;
             color: white;
-        }
-
-        table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .form-container {
-            display: none;
-            margin-bottom: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-container input[type="text"], 
-        .form-container input[type="number"],select {
-            width: 97.5%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-container select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-container button {
-            background-color: #4caf50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .form-container button:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="logo.jpg" alt="Logo" height="40">
-            <h1>Grocery Shop Manager</h1>
-        </div>
-        <div>
-            Welcome, <?php echo htmlspecialchars($owner['name']); ?>
-        </div>
-    </header>
-
+    <div class="header">
+        <h1>Dashboard</h1>
+    </div>
     <div class="container">
         <nav class="sidebar">
-            <h2>Menu</h2>
             <ul>
                 <li><a href="dashboard.php">Dashboard</a></li>
+                <li><a href="stocks.php">Stock Management</a></li>
                 <li><a href="billing.php">Billing</a></li>
-                <li><a href="customer.php">Customer Management</a></li>
+                <li><a href="customer.php">Customers</a></li>
                 <li><a href="report.php">Reports</a></li>
+                <li><a href="profile.php">Profile</a></li>
                 <li><a href="logout.php">Logout</a></li>
             </ul>
         </nav>
-
         <main class="main">
-            <h1>Stock Management </h1>
-            <div class="actions">
-                <button onclick="showForm('addForm')">Add Product</button>
-                <button onclick="showForm('restockForm')">Restock</button>
+            <div class="stats">
+                <div class="card">
+                    <h3>Total Sales</h3>
+                    <p><?php echo $total_sales; ?></p>
+                </div>
+                <div class="card">
+                    <h3>Total Revenue</h3>
+                    <p>₹<?php echo number_format($total_revenue, 2); ?></p>
+                </div>
+                <div class="card">
+                    <h3>Total Customers</h3>
+                    <p><?php echo $total_customers; ?></p>
+                </div>
             </div>
 
-            <!-- Add Product Form -->
-            <div id="addForm" style="display: none;"  class="form-container">
-                <h2>Add Product</h2>
-                <form action="add_product.php" method="POST">
-                    <input type="text" name="name" placeholder="Product Name" required>
-                    <input type="text" name="category" placeholder="Category" required>
-                    <input type="number" name="price" placeholder="Price" step="0.01" required>
-                    <input type="number" name="quantity" placeholder="Quantity" required>
-                    <button type="submit">Save</button>
-                </form>
+            <div class="table-container">
+                <h2>Top Selling Products</h2>
+                <table>
+                    <tr><th>Product</th><th>Units Sold</th></tr>
+                    <?php while ($product = $top_products->fetch_assoc()): ?>
+                        <tr><td><?php echo htmlspecialchars($product['name']); ?></td><td><?php echo $product['total_sold']; ?></td></tr>
+                    <?php endwhile; ?>
+                </table>
             </div>
 
-            <!-- Restock Form -->
-            <div id="restockForm" style="display: none;" class="form-container">
-                <h2>Restock Product</h2>
-                <form action="restock.php" method="POST">
-                    <select name="product_id" required>
-                        <option value="">Select Product</option>
-                        <?php foreach ($products as $product): ?>
-                            <option value="<?php echo $product['product_id']; ?>">
-                                <?php echo htmlspecialchars($product['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="number" name="quantity" placeholder="Quantity to Add" required>
-                    <button type="submit">Restock</button>
-                </form>
+            <div class="table-container">
+                <h2>Low Stock Products</h2>
+                <table>
+                    <tr><th>Product</th><th>Stock Left</th></tr>
+                    <?php while ($stock = $low_stock->fetch_assoc()): ?>
+                        <tr><td><?php echo htmlspecialchars($stock['name']); ?></td><td><?php echo $stock['quantity']; ?></td></tr>
+                    <?php endwhile; ?>
+                </table>
             </div>
 
-            <!-- Products Table -->
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (count($products) > 0): ?>
-                        <?php foreach ($products as $product): ?>
-                            <tr>
-                                <td><?php echo $product['product_id']; ?></td>
-                                <td><?php echo htmlspecialchars($product['name']); ?></td>
-                                <td><?php echo htmlspecialchars($product['category']); ?></td>
-                                <td><?php echo number_format($product['price'], 2); ?></td>
-                                <td><?php echo $product['quantity']; ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" style="text-align:center;">No products available.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+            <div class="table-container">
+                <h2>Recent Transactions</h2>
+                <table>
+                    <tr><th>Date</th><th>Amount</th></tr>
+                    <?php while ($sale = $recent_sales->fetch_assoc()): ?>
+                        <tr><td><?php echo $sale['sale_date']; ?></td><td>₹<?php echo number_format($sale['total_price'], 2); ?></td></tr>
+                    <?php endwhile; ?>
+                </table>
+            </div>
         </main>
     </div>
-
-    <script>
-        function showForm(formId) {
-            document.getElementById('addForm').style.display = 'none';
-            document.getElementById('restockForm').style.display = 'none';
-            document.getElementById(formId).style.display = 'block';
-        }
-    </script>
 </body>
 </html>

@@ -39,7 +39,7 @@ header .profile-info {
     background-color: #e8f5e9;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    height: 100vh;
+    height: auto;
 }
 
 .sidebar h2 {
@@ -124,7 +124,7 @@ header .profile-info {
 
 .form-container {
     width: 400px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     background-color: white;
     padding: 20px;
     border-radius: 5px;
@@ -134,7 +134,7 @@ header .profile-info {
 .form-container input[type="text"], 
 .form-container input[type="number"], 
 .form-container select {
-    width: 97.5%;
+    width: 90.5%;
     padding: 15px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
