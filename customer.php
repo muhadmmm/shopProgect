@@ -9,6 +9,12 @@ require 'db.php';
 
 $owner_id = $_SESSION['owner_id'];
 
+// Fetch owner details
+$stmt = $conn->prepare("SELECT name FROM owners WHERE owner_id = ?");
+$stmt->bind_param("i", $owner_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$owner = $result->fetch_assoc();
 // Fetch all customers
 $stmt = $conn->prepare("SELECT * FROM customers WHERE owner_id = ?");
 $stmt->bind_param("i", $owner_id);
@@ -55,11 +61,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Management</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" <?php echo "href='styles.css?v=" . time() . "'"; ?>>
 </head>
 <body>
     <header class="header">
         <h1>Customer Management</h1>
+        <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
+        
     </header>
     <div class="container">
         <nav class="sidebar">

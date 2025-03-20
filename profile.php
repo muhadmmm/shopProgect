@@ -32,6 +32,11 @@ $owner = $result->fetch_assoc();
         
         body {
             background: #f4f4f4;
+            background-image: url('images/shop-bg.jpg');
+            background-blend-mode: darken;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
             display: flex;
         }
 
@@ -55,7 +60,7 @@ $owner = $result->fetch_assoc();
         }
 
         .sidebar ul li {
-            padding: 15px;
+           
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -63,6 +68,7 @@ $owner = $result->fetch_assoc();
             text-decoration: none;
             color: white;
             display: block;
+            padding: 15px;
         }
 
         .sidebar ul li:hover {
@@ -76,16 +82,19 @@ $owner = $result->fetch_assoc();
         }
 
         .header {
-            background: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #4caf50;
             color: white;
-            padding: 15px;
-            text-align: right;
-            font-size: 18px;
-            border-radius: 5px;
+            border-radius: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .profile-container {
-            background: white;
+            background-color:rgba(255, 255, 255, 0.74);
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -118,7 +127,7 @@ $owner = $result->fetch_assoc();
 
         .settings {
             margin-top: 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.74);
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -135,6 +144,7 @@ $owner = $result->fetch_assoc();
             padding: 10px 15px;
             text-decoration: none;
             border-radius: 5px;
+            margin-top: 10px;
             margin-right: 10px;
         }
 
@@ -168,6 +178,7 @@ $owner = $result->fetch_assoc();
 
     <div class="main-content">
         <div class="header">
+            <h1>Profile</h1>
             Welcome, <?php echo htmlspecialchars($owner['name']); ?>
         </div>
 
@@ -175,17 +186,17 @@ $owner = $result->fetch_assoc();
             <img src="images/profile.png" alt="Profile Picture" class="profile-image">
             <div class="profile-details">
                 <h2><?php echo htmlspecialchars($owner['name']); ?></h2>
-                <p><strong>Email:</strong> <?php echo htmlspecialchars($owner['email']); ?></p>
-                <p><strong>Phone:</strong> <?php echo htmlspecialchars($owner['phone']); ?></p>
-                <a href="edit_profile.php" class="btn">Edit Profile</a>
+                <p><strong>Email:</strong><strong> <?php echo htmlspecialchars($owner['email']); ?></strong></p>
+                <p><strong>Phone:</strong><strong> <?php echo htmlspecialchars($owner['phone']); ?></strong></p>
+                <a href="edit_profile.php" class="btn"><b>Edit Profile </b> </a>
             </div>
         </div>
 
         <div class="settings">
             <h3>Settings</h3>
-            <p>Manage your account settings and preferences.</p>
-            <a href="change_password.php" class="btn">Change Password</a>
-            <a href="logout.php" class="btn logout-btn">Logout</a>
+            <p><strong>Manage your account settings and preferences.</strong></p>
+            <a href="change_password.php" class="btn"><b> Change Password</b></a>
+            <a href="logout.php" class="btn logout-btn"><b>Logout</b></a>
         </div>
     </div>
 

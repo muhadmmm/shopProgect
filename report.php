@@ -21,7 +21,7 @@ $stmt->execute();
 $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 // Fetch profit & loss report
-$stmt = $conn->prepare("SELECT p.name, (s.total_price - (p.price * s.quantity_sold)) AS profit FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.owner_id = ?");
+$stmt = $conn->prepare("SELECT p.name, (s.total_price - (p.cost_price * s.quantity_sold)) AS profit FROM sales s JOIN products p ON s.product_id = p.product_id WHERE s.owner_id = ?");
 $stmt->bind_param("i", $owner_id);
 $stmt->execute();
 $profits = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -39,7 +39,7 @@ $owner = $result->fetch_assoc();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Report</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" <?php echo "href='report.css?v=" . time() . "'"; ?>>
 </head>
 <body>
     <header class="header">
@@ -55,6 +55,7 @@ $owner = $result->fetch_assoc();
                 <li><a href="billing.php">Billing</a></li>
                 <li><a href="customer.php">Customer Management</a></li>
                 <li><a href="report.php">Reports</a></li>
+                <li><a href="profile.php">Profile</a></li>
                 <li><a href="logout.php">Logout</a></li>
             </ul>
         </nav>
@@ -71,7 +72,7 @@ $owner = $result->fetch_assoc();
             <h2>Most Sold Products</h2>
             <div class="graph" style="width: 100%; height: <?php echo 45 * count($products); ?>px; border: 1px solid #ccc; display: flex; flex-direction: column;">
                 <?php foreach ($products as $product): ?>
-                    <div style="width: <?php echo $product['total_sold'] * 20; ?>px; height: 20px; background-color: #ff9800; color: #fff; padding: 10px; margin: 2px;">
+                    <div style="width: <?php echo $product['total_sold'] * 10; ?>px; height: 20px; background-color: #ff9800; color: #fff; padding: 10px; margin: 2px;">
                         <?php echo htmlspecialchars($product['name']) . " - " . $product['total_sold']; ?>
                     </div>
                 <?php endforeach; ?>

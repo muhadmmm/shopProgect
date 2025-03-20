@@ -11,6 +11,7 @@ body {
     justify-content: space-between;
     padding: 10px 20px;
     background-color: #4caf50;
+    border-bottom: #f1f1f1 solid 1px;
     color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
 }
@@ -24,15 +25,15 @@ body {
 
 .sidebar {
     width: 250px;
-    background-color: #e8f5e9;
+    background: #4CAF50;
+    height: auto;
+    color: white;
     padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    height: 100vh;
 }
 
 .sidebar h2 {
-    margin-top: 0;
-    color: #4caf50;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .sidebar ul {
@@ -41,17 +42,19 @@ body {
 }
 
 .sidebar ul li {
-    margin: 15px 0;
+   
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sidebar ul li a {
     text-decoration: none;
-    color: #333;
-    font-size: 16px;
+    padding: 15px;
+    color: white;
+    display: block;
 }
 
-.sidebar ul li a:hover {
-    color: #218838;
+.sidebar ul li:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 .main {
     flex-grow: 1;

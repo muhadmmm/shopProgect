@@ -18,7 +18,8 @@ $result = $stmt->get_result();
 $owner = $result->fetch_assoc();
 
 // Fetch products
-$products_result = $conn->query("SELECT * FROM products");
+$products_result = $conn->query("SELECT * FROM products where owner_id = $owner_id");
+
 $products = $products_result->fetch_all(MYSQLI_ASSOC);
 ?>
 
@@ -43,6 +44,7 @@ $products = $products_result->fetch_all(MYSQLI_ASSOC);
             padding: 10px 20px;
             background-color: #4caf50;
             color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
@@ -84,12 +86,13 @@ $products = $products_result->fetch_all(MYSQLI_ASSOC);
         }
 
         .sidebar ul li {
-            padding: 15px;
+            
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidebar ul li a {
             text-decoration: none;
+            padding: 15px;
             color: white;
             display: block;
         }

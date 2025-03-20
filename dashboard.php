@@ -8,6 +8,13 @@ if (!isset($_SESSION['owner_id'])) {
 require 'db.php';
 $owner_id = $_SESSION['owner_id'];
 
+// Fetch owner details  
+$stmt = $conn->prepare("SELECT name FROM owners WHERE owner_id = ?");
+$stmt->bind_param("i", $owner_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$owner = $result->fetch_assoc();
+
 // Fetch sales stats
 $sales_query = $conn->query("SELECT COUNT(*) AS total_sales, SUM(total_price) AS revenue FROM sales WHERE owner_id = $owner_id");
 $sales_data = $sales_query->fetch_assoc();
@@ -21,7 +28,7 @@ $top_products = $conn->query("SELECT p.name, SUM(s.quantity_sold) as total_sold 
 $low_stock = $conn->query("SELECT name, quantity FROM products WHERE quantity < 5 AND owner_id = $owner_id LIMIT 5");
 
 // Fetch customer insights
-$customer_query = $conn->query("SELECT COUNT(DISTINCT customer_id) AS total_customers FROM sales WHERE owner_id = $owner_id");
+$customer_query = $conn->query("SELECT COUNT(*) AS total_customers FROM customers WHERE owner_id = $owner_id");
 $customer_data = $customer_query->fetch_assoc();
 $total_customers = $customer_data['total_customers'] ?? 0;
 
@@ -43,31 +50,50 @@ $recent_sales = $conn->query("SELECT sale_date, total_price FROM sales WHERE own
             background: #f4f4f4;
         }
         .header {
-            background: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #4caf50;
             color: white;
-            padding: 15px;
-            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .container {
             display: flex;
         }
         .sidebar {
             width: 250px;
-            background: #e8f5e9;
+            background: #4CAF50;
+            height: auto;
+            color: white;
             padding: 20px;
-            height: 100vh;
         }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
         }
+
         .sidebar ul li {
-            margin: 15px 0;
+            
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         .sidebar ul li a {
             text-decoration: none;
-            color: #333;
-            font-size: 16px;
+            padding: 15px;
+            color: white;
+            display: block;
+        }
+
+        .sidebar ul li:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
         .main {
             flex-grow: 1;
@@ -105,9 +131,11 @@ $recent_sales = $conn->query("SELECT sale_date, total_price FROM sales WHERE own
 <body>
     <div class="header">
         <h1>Dashboard</h1>
+        <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </div>
     <div class="container">
         <nav class="sidebar">
+            <h2>Menu</h2>
             <ul>
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="stocks.php">Stock Management</a></li>

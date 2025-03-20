@@ -4,15 +4,23 @@ if (!isset($_SESSION['owner_id'])) {
     header('Location: login.html');
     exit();
 }
+
 require 'db.php';
 $owner_id = $_SESSION['owner_id'];
+
+// Fetch owner details
 $stmt = $conn->prepare("SELECT name FROM owners WHERE owner_id = ?");
 $stmt->bind_param("i", $owner_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $owner = $result->fetch_assoc();
-$products_result = $conn->query("SELECT * FROM products");
-$products = $products_result->fetch_all(MYSQLI_ASSOC);
+
+// Fetch products based on owner_id
+$stmt = $conn->prepare("SELECT * FROM products WHERE owner_id = ?");
+$stmt->bind_param("i", $owner_id);
+$stmt->execute();
+$products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
 $bill_items = [];
 $total_amount = 0;
 $discounted_total = 0;
@@ -21,37 +29,54 @@ $customer_name = '';
 $customer_phone = '';
 $customer_id = NULL;
 
+// Save customer details
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_customer'])) {
     $customer_name = $_POST['customer_name'];
     $customer_phone = $_POST['customer_phone'];
-    $stmt = $conn->prepare("SELECT phone FROM customers WHERE phone = ? AND owner_id = ?");
+
+    $stmt = $conn->prepare("SELECT customer_id FROM customers WHERE phone = ? AND owner_id = ?");
     $stmt->bind_param("si", $customer_phone, $owner_id);
     $stmt->execute();
     $customer = $stmt->get_result()->fetch_assoc();
+
     if (!$customer) {
         $stmt = $conn->prepare("INSERT INTO customers (name, phone, discount, owner_id) VALUES (?, ?, 1, ?)");
         $stmt->bind_param("ssi", $customer_name, $customer_phone, $owner_id);
         $stmt->execute();
+        $customer_id = $conn->insert_id; // Get new customer ID
+    } else {
+        $customer_id = $customer['customer_id'];
     }
 }
+
+// Handle billing
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
     $customer_name = $_POST['customer_name'];
     $customer_phone = $_POST['customer_phone'];
-    $stmt = $conn->prepare("SELECT discount FROM customers WHERE phone = ? AND owner_id = ?");
+    $sale_date = date('Y-m-d H:i:s'); // Capture current date & time
+
+    // Get customer ID and discount
+    $stmt = $conn->prepare("SELECT customer_id, discount FROM customers WHERE phone = ? AND owner_id = ?");
     $stmt->bind_param("si", $customer_phone, $owner_id);
     $stmt->execute();
     $customer = $stmt->get_result()->fetch_assoc();
+
     if ($customer) {
+        $customer_id = $customer['customer_id'];
         $customer_discount = ($customer['discount'] == 1) ? 0.05 : 0;
     }
+
     if (isset($_POST['selected_products'])) {
         foreach ($_POST['selected_products'] as $product_id) {
             if (!empty($_POST['products'][$product_id])) {
                 $quantity = (int)$_POST['products'][$product_id];
-                $stmt = $conn->prepare("SELECT name, price, quantity FROM products WHERE product_id = ?");
-                $stmt->bind_param("i", $product_id);
+
+                // Fetch product details
+                $stmt = $conn->prepare("SELECT name, price, quantity FROM products WHERE product_id = ? AND owner_id = ?");
+                $stmt->bind_param("ii", $product_id, $owner_id);
                 $stmt->execute();
                 $product = $stmt->get_result()->fetch_assoc();
+
                 if ($product && $product['quantity'] >= $quantity) {
                     $total_price = $product['price'] * $quantity;
                     $total_amount += $total_price;
@@ -61,49 +86,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
                         'price' => $product['price'],
                         'total' => $total_price
                     ];
-                    $stmt = $conn->prepare("UPDATE products SET quantity = quantity - ? WHERE product_id = ?");
-                    $stmt->bind_param("ii", $quantity, $product_id);
-                    $stmt->execute();
-                }
-            }
-        }
-    }
-    $discounted_total = $total_amount - ($total_amount * $customer_discount);
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
-    $customer_name = $_POST['customer_name'];
-    $customer_phone = $_POST['customer_phone'];
-    $sale_date = date('Y-m-d H:i:s'); // Capture current date & time
-    
-    if (isset($_POST['selected_products'])) {
-        foreach ($_POST['selected_products'] as $product_id) {
-            if (!empty($_POST['products'][$product_id])) {
-                $quantity = (int)$_POST['products'][$product_id];
 
-                // Fetch product price
-                $stmt = $conn->prepare("SELECT price, quantity FROM products WHERE product_id = ?");
-                $stmt->bind_param("i", $product_id);
-                $stmt->execute();
-                $product = $stmt->get_result()->fetch_assoc();
-
-                if ($product && $product['quantity'] >= $quantity) {
-                    $total_price = $product['price'] * $quantity;
-
-                    // Insert sale record into `sales` table
-                    $stmt = $conn->prepare("INSERT INTO sales (product_id, quantity_sold, total_price, sale_date) VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param("iids", $product_id, $quantity, $total_price, $sale_date);
+                    // Insert sale record with customer_id
+                    $stmt = $conn->prepare("INSERT INTO sales (product_id, quantity_sold, total_price, sale_date, owner_id, customer_id) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->bind_param("iidsii", $product_id, $quantity, $total_price, $sale_date, $owner_id, $customer_id);
                     $stmt->execute();
 
                     // Reduce stock
                     $stmt = $conn->prepare("UPDATE products SET quantity = quantity - ? WHERE product_id = ? AND owner_id = ?");
-                    $stmt->bind_param("iii", $quantity, $product_id , $owner_id);
+                    $stmt->bind_param("iii", $quantity, $product_id, $owner_id);
                     $stmt->execute();
                 }
             }
         }
     }
-}
 
+    // Apply discount if eligible
+    $discounted_total = $total_amount - ($total_amount * $customer_discount);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billing</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" <?php echo "href='styles.css?v=" . time() . "'"; ?>>
 </head>
 <body>
     <header class="header">
