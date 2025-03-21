@@ -43,6 +43,10 @@ $owner = $result->fetch_assoc();
 </head>
 <body>
     <header class="header">
+    <div class="logo">
+            <img src="images/logo.jpg" alt="Groches Logo">
+            <h1>Groches</h1>
+        </div>
         <h1>Sales Report</h1>
         <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </header>

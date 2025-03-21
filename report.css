@@ -15,7 +15,16 @@ body {
     color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1)
 }
+.logo {
+    display: flex;
+    align-items: center;
+}
 
+.logo img {
+    height: 40px;
+    margin-right: 10px;
+    border-radius: 20px;
+}
 .container {
     display: flex;
     max-width: 100%;

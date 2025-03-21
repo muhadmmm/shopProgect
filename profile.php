@@ -92,6 +92,16 @@ $owner = $result->fetch_assoc();
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+    
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 20px;
+        }
 
         .profile-container {
             background-color:rgba(255, 255, 255, 0.74);
@@ -178,6 +188,10 @@ $owner = $result->fetch_assoc();
 
     <div class="main-content">
         <div class="header">
+        <div class="logo">
+            <img src="images/logo.jpg" alt="Groches Logo">
+            <h1>Groches</h1>
+        </div>
             <h1>Profile</h1>
             Welcome, <?php echo htmlspecialchars($owner['name']); ?>
         </div>

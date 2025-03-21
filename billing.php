@@ -116,6 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bill'])) {
 </head>
 <body>
     <header class="header">
+        <div class="logo">
+            <img src="images/logo.jpg" alt="Groches Logo">
+            <h1>Groches</h1>
+        </div>
         <h1>Billing</h1>
         <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </header>

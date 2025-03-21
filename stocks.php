@@ -196,8 +196,9 @@ $products = $products_result->fetch_all(MYSQLI_ASSOC);
     <header>
         <div class="logo">
             <img src="images/logo.jpg" alt="Logo" height="40">
-            <h1>Grocery Shop Manager</h1>
+            <h1>Groches</h1>
         </div>
+        <h1>Stocks</h1>
         <div>
             Welcome, <?php echo htmlspecialchars($owner['name']); ?>
         </div>

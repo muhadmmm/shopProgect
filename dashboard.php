@@ -56,8 +56,18 @@ $recent_sales = $conn->query("SELECT sale_date, total_price FROM sales WHERE own
             padding: 10px 20px;
             background-color: #4caf50;
             color: white;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+    
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 20px;
         }
         .container {
             display: flex;
@@ -130,6 +140,10 @@ $recent_sales = $conn->query("SELECT sale_date, total_price FROM sales WHERE own
 </head>
 <body>
     <div class="header">
+    <div class="logo">
+            <img src="images/logo.jpg" alt="Groches Logo">
+            <h1>Groches</h1>
+        </div>
         <h1>Dashboard</h1>
         <p><strong><?php echo htmlspecialchars($owner['name']); ?></strong></p>
     </div>

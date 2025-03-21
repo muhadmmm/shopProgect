@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groches - Home</title>
+    <style>
+        /* Reset & Body Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+    
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #4caf50;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 999;
+        }
+    
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+    
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        .nav{ margin-right: 30px;}
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+    
+        .nav-links li {
+            margin-left: 20px;
+        }
+    
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+        }
+    
+        .nav-links .login-btn {
+            padding: 5px 10px;
+            background-color: white;
+            color: #4caf50;
+            border-radius: 5px;
+        }
+    
+        .nav-links .login-btn:hover {
+            background-color: #45a049;
+            color: white;
+        }
+    
+        /* Main container */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 80px;
+            padding: 20px;
+        }
+    
+        /* Slideshow */
+        .slideshow {
+            width: 50%;
+            max-width: 700px;
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin: auto;
+            overflow: hidden;
+        }
+    
+        .slide {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: none;
+        }
+    
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+        }
+    
+        .prev { left: 10px; }
+        .next { right: 10px; }
+    
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    
+        /* Dots */
+        .dots-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+    
+        .dot {
+            height: 10px;
+            width: 10px;
+            margin: 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+        }
+    
+        .active-dot {
+            background-color: #4caf50;
+        }
+    
+        /* Features Section */
+        .features {
+            width: 50%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: left;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-left: 20px;
+        }
+    
+        .feature h2 {
+            color: #4caf50;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+    
+        .feature p {
+            text-align: justify;
+            font-size: 14px;
+        }
+    
+        /* About Section */
+        .about {
+            padding: 50px 20px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+    
+        .about h2 {
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+    
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            margin-top: 20px;
+        }
+    </style>
+    
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="logo">
+            <img src="images/logo.jpg" alt="Groches Logo">
+            <h1>Groches</h1>
+        </div>
+        <nav class="nav">
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="login.html" class="login-btn">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Section -->
+<div class="main-container">
+    <!-- Slideshow Section -->
+    <section class="slideshow">
+        <div class="slideshow-container">
+            <img src="images/slide1.png" class="slide">
+            <img src="images/slide2.png" class="slide">
+            <img src="images/slide3.png" class="slide">
+            <img src="images/slide4.png" class="slide">
+
+            <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+            <button class="next" onclick="moveSlide(1)">&#10095;</button>
+        </div>
+        <div class="dots-container">
+            <span class="dot" onclick="setSlide(0)"></span>
+            <span class="dot" onclick="setSlide(1)"></span>
+            <span class="dot" onclick="setSlide(2)"></span>
+            <span class="dot" onclick="setSlide(3)"></span>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature">
+            <h2>Automated Billing System</h2>
+            <p>Groches simplifies the checkout process with an automated billing system that calculates totals, applies discounts for regular customers, and generates printable invoices.</p>
+        </div>
+
+        <div class="feature">
+            <h2>Real-Time Stock Management</h2>
+            <p>Track your inventory seamlessly! Groches updates stock levels in real-time whenever an item is sold, restocked, or edited, ensuring accurate stock control.</p>
+        </div>
+
+        <div class="feature">
+            <h2>Customer Loyalty Discounts</h2>
+            <p>Our system recognizes returning customers by their phone number and automatically applies a 5% discount, encouraging customer retention and satisfaction.</p>
+        </div>
+
+        <div class="feature">
+            <h2>Printable & Downloadable Bills</h2>
+            <p>Generate professional invoices with a single click! Groches allows you to print or download bills as an image file, making it easy to keep records and share with customers.</p>
+        </div>
+    </section>
+</div>
+
+<!-- About Section -->
+<section id="about" class="about">
+    <h2>Groches - Grocery Shop Management System</h2>
+    <p>Groches is a comprehensive grocery shop management system designed to simplify and streamline the daily operations of a grocery store. It allows shop owners to efficiently manage stock, process sales, and maintain customer records with ease. The system includes essential features such as adding and updating stock, tracking inventory, and generating bills for customers. A built-in customer management system ensures that returning customers receive a discount, encouraging customer loyalty. With a secure owner login and a user-friendly interface, Groches provides a seamless experience for store owners, making business management more efficient.</p>
+
+    <p>Beyond inventory and billing, Groches enhances the overall customer experience by ensuring fast and accurate transactions. The system automatically updates stock levels in real time, reducing errors and preventing stock shortages. Store owners can generate detailed sales reports, track revenue trends, and make data-driven business decisions. Additionally, Groches supports printable invoices, making it easier to maintain financial records. Whether you run a small grocery store or a large supermarket, Groches is designed to help you manage your business with efficiency, accuracy, and convenience.</p>
+</section>
+
+    
+    
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <p>&copy; 2025 Groches. All Rights Reserved.</p>
+    </footer>
+
+</body>
+<script>
+
+    let slideIndex = 0;
+
+    function showSlides() {
+        let slides = document.querySelectorAll(".slide");
+        let dots = document.querySelectorAll(".dot");
+
+        slides.forEach((slide, index) => {
+            slide.style.display = (index === slideIndex) ? "block" : "none";
+            dots[index].classList.toggle("active-dot", index === slideIndex);
+        });
+
+        slideIndex = (slideIndex + 1) % slides.length;
+    }
+
+    function moveSlide(step) {
+        let slides = document.querySelectorAll(".slide");
+        slideIndex = (slideIndex + step + slides.length) % slides.length;
+        showSlides();
+    }
+
+    function setSlide(index) {
+        slideIndex = index;
+        showSlides();
+    }
+
+    // Auto-slide every 3 seconds
+    setInterval(showSlides, 3000);
+
+    // Initialize first slide
+    document.addEventListener("DOMContentLoaded", showSlides);
+
+</script>
+</html>
